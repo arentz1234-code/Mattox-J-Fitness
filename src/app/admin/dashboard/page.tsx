@@ -3,27 +3,31 @@ import { prisma } from '@/lib/prisma';
 import AdminDashboard from '@/components/AdminDashboard';
 
 async function getData() {
-  const bookings = await prisma.booking.findMany({
-    orderBy: { dateTime: 'asc' },
-  });
+  try {
+    const bookings = await prisma.booking.findMany({
+      orderBy: { dateTime: 'asc' },
+    });
 
-  const blockedTimes = await prisma.blockedTime.findMany({
-    orderBy: { startTime: 'asc' },
-  });
+    const blockedTimes = await prisma.blockedTime.findMany({
+      orderBy: { startTime: 'asc' },
+    });
 
-  return {
-    bookings: bookings.map((b) => ({
-      ...b,
-      dateTime: b.dateTime.toISOString(),
-      createdAt: b.createdAt.toISOString(),
-    })),
-    blockedTimes: blockedTimes.map((bt) => ({
-      ...bt,
-      startTime: bt.startTime.toISOString(),
-      endTime: bt.endTime.toISOString(),
-      createdAt: bt.createdAt.toISOString(),
-    })),
-  };
+    return {
+      bookings: bookings.map((b) => ({
+        ...b,
+        dateTime: b.dateTime.toISOString(),
+        createdAt: b.createdAt.toISOString(),
+      })),
+      blockedTimes: blockedTimes.map((bt) => ({
+        ...bt,
+        startTime: bt.startTime.toISOString(),
+        endTime: bt.endTime.toISOString(),
+        createdAt: bt.createdAt.toISOString(),
+      })),
+    };
+  } catch {
+    return { bookings: [], blockedTimes: [] };
+  }
 }
 
 export default async function DashboardPage() {

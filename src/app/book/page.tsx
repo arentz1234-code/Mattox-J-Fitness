@@ -3,48 +3,52 @@ import BookingCalendar from '@/components/BookingCalendar';
 import { prisma } from '@/lib/prisma';
 
 async function getBookingsAndBlockedTimes() {
-  const now = new Date();
-  const twoWeeksFromNow = new Date();
-  twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+  try {
+    const now = new Date();
+    const twoWeeksFromNow = new Date();
+    twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      dateTime: {
-        gte: now,
-        lte: twoWeeksFromNow,
+    const bookings = await prisma.booking.findMany({
+      where: {
+        dateTime: {
+          gte: now,
+          lte: twoWeeksFromNow,
+        },
       },
-    },
-    select: {
-      dateTime: true,
-    },
-  });
+      select: {
+        dateTime: true,
+      },
+    });
 
-  const blockedTimes = await prisma.blockedTime.findMany({
-    where: {
-      OR: [
-        {
-          startTime: {
-            gte: now,
-            lte: twoWeeksFromNow,
+    const blockedTimes = await prisma.blockedTime.findMany({
+      where: {
+        OR: [
+          {
+            startTime: {
+              gte: now,
+              lte: twoWeeksFromNow,
+            },
           },
-        },
-        {
-          endTime: {
-            gte: now,
-            lte: twoWeeksFromNow,
+          {
+            endTime: {
+              gte: now,
+              lte: twoWeeksFromNow,
+            },
           },
-        },
-      ],
-    },
-  });
+        ],
+      },
+    });
 
-  return {
-    bookedSlots: bookings.map((b) => b.dateTime.toISOString()),
-    blockedTimes: blockedTimes.map((bt) => ({
-      startTime: bt.startTime.toISOString(),
-      endTime: bt.endTime.toISOString(),
-    })),
-  };
+    return {
+      bookedSlots: bookings.map((b) => b.dateTime.toISOString()),
+      blockedTimes: blockedTimes.map((bt) => ({
+        startTime: bt.startTime.toISOString(),
+        endTime: bt.endTime.toISOString(),
+      })),
+    };
+  } catch {
+    return { bookedSlots: [], blockedTimes: [] };
+  }
 }
 
 export default async function BookPage() {
