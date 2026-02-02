@@ -2,6 +2,9 @@ import Link from 'next/link';
 import BookingCalendar from '@/components/BookingCalendar';
 import { prisma } from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 async function getBookingsAndBlockedTimes() {
   try {
     const now = new Date();
