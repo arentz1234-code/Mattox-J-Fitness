@@ -1,17 +1,6 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import AdminDashboard from '@/components/AdminDashboard';
-
-async function checkAuth() {
-  const cookieStore = cookies();
-  const token = cookieStore.get('admin_token');
-  if (!token) {
-    redirect('/admin');
-  }
-  return true;
-}
 
 async function getData() {
   const bookings = await prisma.booking.findMany({
@@ -38,7 +27,6 @@ async function getData() {
 }
 
 export default async function DashboardPage() {
-  await checkAuth();
   const { bookings, blockedTimes } = await getData();
 
   return (
@@ -53,11 +41,9 @@ export default async function DashboardPage() {
             <span className="text-gray-300">|</span>
             <span className="text-gray-600">Admin Dashboard</span>
           </div>
-          <form action="/api/admin/logout" method="POST">
-            <button type="submit" className="text-gray-600 hover:text-gray-900">
-              Sign Out
-            </button>
-          </form>
+          <Link href="/" className="text-gray-600 hover:text-gray-900">
+            Back to Site
+          </Link>
         </div>
       </header>
 
