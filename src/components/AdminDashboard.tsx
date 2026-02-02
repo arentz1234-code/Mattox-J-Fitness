@@ -32,6 +32,7 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'calendar' | 'bookings' | 'timeoff'>('calendar');
   const [weekOffset, setWeekOffset] = useState(0);
+  const maxWeekOffset = 2; // Only show 2 weeks in advance
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showBlockForm, setShowBlockForm] = useState(false);
   const [blockForm, setBlockForm] = useState({
@@ -249,13 +250,21 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {/* Week Navigation */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            <button onClick={() => setWeekOffset(weekOffset - 1)} className="btn-secondary text-sm">
+            <button
+              onClick={() => setWeekOffset(weekOffset - 1)}
+              disabled={weekOffset <= 0}
+              className={`btn-secondary text-sm ${weekOffset <= 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
               &larr; Previous
             </button>
             <span className="font-semibold">
               {weekDates[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
             </span>
-            <button onClick={() => setWeekOffset(weekOffset + 1)} className="btn-secondary text-sm">
+            <button
+              onClick={() => setWeekOffset(weekOffset + 1)}
+              disabled={weekOffset >= maxWeekOffset}
+              className={`btn-secondary text-sm ${weekOffset >= maxWeekOffset ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
               Next &rarr;
             </button>
           </div>
