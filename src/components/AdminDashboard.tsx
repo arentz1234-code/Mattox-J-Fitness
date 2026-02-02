@@ -205,7 +205,7 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
           <div className="text-gray-600">Past Bookings</div>
         </div>
         <div className="bg-white rounded-xl p-6 shadow-sm">
-          <div className="text-3xl font-bold text-yellow-600">{blockedTimes.length}</div>
+          <div className="text-3xl font-bold text-red-600">{blockedTimes.length}</div>
           <div className="text-gray-600">Blocked Times</div>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
                         key={`${hour}-${dayIndex}`}
                         className={`p-2 min-h-[60px] border-r border-gray-100 last:border-r-0 ${
                           booking ? 'bg-primary/10 cursor-pointer hover:bg-primary/20' : ''
-                        } ${blocked && !booking ? 'bg-yellow-50' : ''}`}
+                        } ${blocked && !booking ? 'bg-red-50' : ''}`}
                         onClick={() => booking && setSelectedBooking(booking)}
                       >
                         {booking && (
@@ -312,7 +312,7 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
                           </div>
                         )}
                         {blocked && !booking && (
-                          <div className="text-xs text-yellow-700 font-medium">Blocked</div>
+                          <div className="text-xs text-red-700 font-medium">Blocked</div>
                         )}
                       </div>
                     );

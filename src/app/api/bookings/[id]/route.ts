@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 
 export async function DELETE(
@@ -7,13 +6,6 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check admin auth
-    const cookieStore = cookies();
-    const token = cookieStore.get('admin_token');
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const id = parseInt(params.id);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid booking ID' }, { status: 400 });
