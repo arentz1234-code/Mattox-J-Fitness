@@ -10,6 +10,7 @@ interface Booking {
   phone: string;
   reason: string;
   dateTime: string;
+  notes: string | null;
   createdAt: string;
 }
 
@@ -44,6 +45,8 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
     blockType: 'single',
   });
   const [loading, setLoading] = useState(false);
+  const [editingNotes, setEditingNotes] = useState('');
+  const [savingNotes, setSavingNotes] = useState(false);
 
   const upcomingBookings = bookings.filter((b) => new Date(b.dateTime) >= new Date());
   const pastBookings = bookings.filter((b) => new Date(b.dateTime) < new Date());
@@ -116,6 +119,30 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
       console.error('Error canceling booking:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveNotes = async (id: number) => {
+    setSavingNotes(true);
+    try {
+      const res = await fetch(`/api/bookings/${id}/notes`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: editingNotes }),
+      });
+      if (res.ok) {
+        const updatedBooking = await res.json();
+        if (selectedBooking) {
+          setSelectedBooking({ ...selectedBooking, notes: updatedBooking.notes });
+        }
+        router.refresh();
+        alert('Notes saved and email sent to client!');
+      }
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      alert('Failed to save notes');
+    } finally {
+      setSavingNotes(false);
     }
   };
 
@@ -310,7 +337,12 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
                         className={`p-2 min-h-[60px] border-r border-gray-100 last:border-r-0 ${
                           booking ? 'bg-primary/10 cursor-pointer hover:bg-primary/20' : ''
                         } ${blocked && !booking ? 'bg-red-50' : ''}`}
-                        onClick={() => booking && setSelectedBooking(booking)}
+                        onClick={() => {
+                          if (booking) {
+                            setSelectedBooking(booking);
+                            setEditingNotes(booking.notes || '');
+                          }
+                        }}
                       >
                         {booking && (
                           <div className="text-xs">
@@ -600,6 +632,22 @@ export default function AdminDashboard({ bookings, blockedTimes }: AdminDashboar
               <div>
                 <p className="text-gray-400 text-sm">Reason for Contact</p>
                 <p className="bg-gray-50 p-3 rounded-lg">{selectedBooking.reason}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm mb-2">Notes (sends email to client when saved)</p>
+                <textarea
+                  value={editingNotes}
+                  onChange={(e) => setEditingNotes(e.target.value)}
+                  className="input w-full h-24 resize-none"
+                  placeholder="Add notes for this client..."
+                />
+                <button
+                  onClick={() => handleSaveNotes(selectedBooking.id)}
+                  disabled={savingNotes}
+                  className="btn-primary w-full mt-2"
+                >
+                  {savingNotes ? 'Saving & Sending Email...' : 'Save Notes & Email Client'}
+                </button>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
